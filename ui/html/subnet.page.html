@@ -1,0 +1,45 @@
+{{define "page-title"}}Subnet #{{.Subnet.ID.Hex}}{{end}}
+
+{{define "page-body"}}
+  {{with .Subnet}}
+    <!-- TODO -->
+    <div class="snippet">
+      <div class="metadata">
+        <strong>{{.Name}}</strong>
+        <span>#{{.ID.Hex}}</span>
+      </div>
+      <div class="metadata">
+        <strong>IP:</strong>
+        <span>{{.IP}}</span>
+      </div>
+      <div class="metadata">
+        <strong>Mask:</strong>
+        <span>{{.Mask}}</span>
+      </div>
+      <div class="metadata">
+        <time>TEST</time>
+        <time>TEST2</time>
+      </div>
+  {{end}}
+  {{if .Devices}}
+    {{with .Devices}}
+      <pre>
+        <div class="title">IPs in Subnet:</div>
+        {{range . -}}
+          <div class="linkeddata">
+          <strong><a href="/devices/{{.ID.Hex}}">
+          {{- range .Interfaces -}}
+            {{range .IPs -}}
+              {{.IP}}
+            {{- end}}
+          {{- end -}}
+          </a></strong> <span>{{.Name}}</span>
+          </div>
+        {{- end}}
+      </pre>
+    </div>
+    {{end}}
+  {{else}}
+    <div class="title">No IPs for Subnet <b>{{.Subnet.Name}}</b> - {{.Subnet.ID.Hex}}</div>
+  {{end}}
+{{end}}

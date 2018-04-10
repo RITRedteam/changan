@@ -1,0 +1,59 @@
+{{define "page-title"}}Add a New Device{{end}}
+
+{{define "page-body"}}
+<script src="static/js/jquery.js"></script>
+<script src="/static/js/app.js"></script>
+
+<form action="/devices/new" method="POST">
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+  {{with .Form}}
+    <div>
+      <label>Name:</label>
+      {{with .Failures.Name}}
+        <label class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="name" value="{{.Name}}">
+    </div>
+    <div>
+      <label>Team:</label>
+      {{with .Failures.Team}}
+        <label class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="team" value={{.Team}}>
+    </div>
+    <div>
+      <label>Owner:</label>
+      {{with .Failures.Owner}}
+        <label class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="owner" value={{.Owner}}>
+    </div>
+    <div>
+      <label>Location:</label>
+      {{with .Failures.Location}}
+        <label class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="location" value={{.Location}}>
+      <!-- <textarea name="location">{{.Location}}</textarea> -->
+    </div>
+    <div class="interfaces">
+      <div class="interface">
+        <label for="interfaceName">Interface Name:</label>
+        <input name="interfaceName[]" id="interfaceName" value="" type="text">
+        <label for="interfaceMAC">Interface MAC:</label>
+        <input name="interfaceMAC[]" id="interfaceMAC" value="" type="text">
+        <label for="interfaceIP">Interface IP:</label>
+        <input name="interfaceIP[]" id="interfaceIP" value="" type="text">
+
+        <p><a href="#" class="remove">Remove Section</a></p>
+      </div>
+    </div>
+    <div>
+      <p><a href="#" class="addinterface">Add Interface</a></p>
+    </div>
+    <div>
+      <input type="submit" value="Add Device">
+    </div>
+  {{end}}
+</form>
+{{end}}

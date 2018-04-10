@@ -1,0 +1,35 @@
+{{define "base"}}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{template "page-title" .}} - ChangAn</title>
+    <!-- link to CSS stylesheet and favicon -->
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="shortcut icon" href="/static/img/favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <header>
+      <h1><a href="/">ChangAn</a></h1>
+    </header>
+    <nav>
+      <a href="/" {{if eq .Path "/"}}class="live"{{end}}>Home</a>
+      <a href="/devices" {{if eq .Path "/devices"}}class="live"{{end}}>Devices</a>
+      <a href="/subnets" {{if eq .Path "/subnets"}}class="live"{{end}}>Subnets</a>
+      {{if .LoggedIn}}
+      <a href="/devices/new" {{if eq .Path "/devices/new"}}class="live"{{end}}>New device</a>
+      <form action="/user/logout" method="POST">
+        <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+        <button>Logout</button>
+      </form>
+      {{else}}
+      <a href="/user/login" {{if eq .Path "/user/login"}}class="live"{{end}}>Login</a>
+      <a href="/user/signup" {{if eq .Path "/user/signup"}}class="live"{{end}}>Signup</a>
+      {{end}}
+    </nav>
+    <section>
+      {{template "page-body" .}}
+    </section>
+  </body>
+</html>
+{{end}}

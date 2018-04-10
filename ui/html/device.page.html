@@ -1,0 +1,43 @@
+{{define "page-title"}}Device #{{.Device.ID.Hex}}{{end}}
+
+{{define "page-body"}}
+  {{with .Device}}
+    <!-- TODO -->
+    <div class="snippet">
+      <div class="metadata">
+        <strong>{{.Name}}</strong>
+        <span>#{{.ID.Hex}}</span>
+      </div>
+      <div class="metadata">
+        <strong>Team:</strong>
+        <span>{{.Team}}</span>
+      </div>
+      <div class="metadata">
+        <strong>Owner:</strong>
+        <span>{{.Owner}}</span>
+      </div>
+      <div class="metadata">
+        <strong>Location:</strong>
+        <span>{{.Location}}</span>
+      </div>
+      <div class="metadata">
+        <time>TEST</time>
+        <time>TEST2</time>
+      </div>
+  {{end}}
+  <pre>
+  {{if .Reports}}
+    {{with .Reports}}
+      <div class="title">Reports:</div>
+      {{range . -}}
+        <div class="linkeddata">
+        <strong><a href="/reports/{{.ID.Hex}}">{{.Title}}</a></strong>
+        <span>Holding place for user</span>
+        </div>
+      {{end}}
+    {{end}}
+  {{else}}
+    <div class="title">No Reports for Device <b>{{.Device.Name}}</b> - <b>{{.Device.ID.Hex}}</b></div>
+  {{end}}
+  </pre>
+{{end}}

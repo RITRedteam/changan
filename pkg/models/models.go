@@ -1,0 +1,40 @@
+package models
+
+import (
+	"gopkg.in/mgo.v2/bson"
+)
+
+type Device struct {
+	ID         bson.ObjectId `bson:"_id" json:"device_id"`
+	Name       string        `bson:"device_name" json:"device_name"`
+	Team       string        `bson:"team" json:"team"`
+	Owner      string        `bson:"owner" json:"owner"`
+	Location   string        `bson:"location" json:"location"`
+	Interfaces []Interface   `bson:"interfaces" json:"interfaces"`
+}
+
+type Interface struct {
+	//ID   int    `bson:"_id"`
+	IPs  []IP   `bson:"ips" json:"ips"`
+	MAC  string `bson:"mac" json:"mac"`
+	Name string `bson:"interface_name" json:"interface_name"`
+}
+
+type IP struct {
+	SubnetID bson.ObjectId `bson:"subnet_id" json:"subnet_id"`
+	IP       string        `bson:"ip" json:"ip"`
+}
+
+type Subnet struct {
+	ID   bson.ObjectId `bson:"_id" json:"subnet_id"`
+	Name string        `bson:"subnet_name" json:"subnet_name"`
+	IP   string        `bson:"ip" json:"ip"`
+	Mask int           `bson:"mask" json:"mask"`
+}
+
+type Report struct {
+	ID       bson.ObjectId `bson:"_id" json:"report_id"`
+	DeviceID bson.ObjectId `bson:"device_id" json:"device_id"`
+	Title    string        `bson:"title" json:"title"`
+	Report   string        `bson:"report" json:"report"`
+}

@@ -1,0 +1,43 @@
+{{define "page-title"}}Devices{{end}}
+
+{{define "page-body"}}
+  <!-- TODO -->
+  <div class="snippet">
+    <table style="width:100%">
+      <tr>
+        <th>Device ID</th>
+        <th>Name</th>
+        <th>Team</th>
+        <th>Owner</th>
+        <th>Location</th>
+        <th>Interfaces</th>
+      </tr>
+      <div>
+        {{if .Devices}}
+          {{range .Devices}}
+          <tr>
+            <td><a href="/devices/{{.ID.Hex}}">{{.ID.Hex}}</a></td>
+            <td>{{.Name}}</td>
+            <td>{{.Team}}</td>
+            <td>{{.Owner}}</td>
+            <td>{{.Location}}</td>
+            <td>
+            {{range .Interfaces}}
+              <b>{{.Name}}</b><br>
+              <b>{{.MAC}}</b><br>
+              {{range .IPs}}
+              <b>
+                  {{.IP}}
+              </b>
+              {{end}}
+            {{end}}
+            </td>
+          </tr>
+          {{end}}
+        {{else}}
+          <p>There are no Devices to show!</p>
+        {{end}}
+      </div>
+    </table>
+  </div>
+{{end}}

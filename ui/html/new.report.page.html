@@ -1,0 +1,35 @@
+{{define "page-title"}}Add a New Device{{end}}
+
+{{define "page-body"}}
+<script src="static/js/jquery.js"></script>
+<script src="/static/js/app.js"></script>
+
+<form action="/reports/new" method="POST">
+  <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+  <label>Device:</label>
+  <select name="device">
+    {{range .Devices}}
+      <option value="{{.ID.Hex}}">{{.Name}}</option>
+    {{end}}
+  </select>
+  {{with .Form}}
+    <div>
+      <label>Title:</label>
+      {{with .Failures.Title}}
+        <label class="error">{{.}}</label>
+      {{end}}
+      <input type="text" name="title" value="{{.Title}}">
+    </div>
+    <div>
+      <label>Report:</label>
+      {{with .Failures.Report}}
+        <label class="error">{{.}}</label>
+      {{end}}
+      <textarea name="report">{{.Report}}</textarea>
+    </div>
+    <div>
+      <input type="submit" value="Add Report">
+    </div>
+  {{end}}
+</form>
+{{end}}

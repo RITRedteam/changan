@@ -1,0 +1,20 @@
+{{define "page-title"}}Subnet #{{.Report.ID.Hex}}{{end}}
+
+{{define "page-body"}}
+  {{with .Report}}
+    <!-- TODO -->
+    <div class="snippet">
+      <div class="metadata">
+        <strong>{{.Title}}</strong>
+        <span>#{{.ID.Hex}}</span>
+      </div>
+      <div class="metadata">
+        <time>TEST</time>
+        <time>TEST2</time>
+      </div>
+  {{end}}
+    <pre><code>
+      {{.Report.Report}}
+    </code></pre>
+  </div>
+{{end}}

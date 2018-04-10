@@ -1,0 +1,29 @@
+{{define "page-title"}}Devices{{end}}
+
+{{define "page-body"}}
+  <!-- TODO -->
+  <div class="snippet">
+    <table style="width:100%">
+      <tr>
+        <th>Subnet ID</th>
+        <th>Name</th>
+        <th>IP</th>
+        <th>Mask</th>
+      </tr>
+      <div>
+        {{if .Subnets}}
+          {{range .Subnets}}
+          <tr>
+            <td><a href="/subnets/{{.ID.Hex}}">{{.ID.Hex}}</a></td>
+            <td>{{.Name}}</td>
+            <td>{{.IP}}</td>
+            <td>{{.Mask}}</td>
+          </tr>
+          {{end}}
+        {{else}}
+          <p>There are no Subnets to show!</p>
+        {{end}}
+      </div>
+    </table>
+  </div>
+{{end}}
