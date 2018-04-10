@@ -156,6 +156,16 @@ a.button:hover, input[type="submit"]:hover {
   text-decoration: none;
 }
 
+.add {
+  background-color: #62CB31;
+  border-radius: 3px;
+  color: #FFFFFF;
+  padding: 18px 27px;
+  border: none;
+  display: inline-block;
+  font-weight: 700;
+}
+
 form div {
   margin-bottom: 18px;
 }

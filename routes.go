@@ -52,6 +52,9 @@ func (app *App) GenerateRoutes() []Route {
 		Route{"APISubnetsAdd", "PUT", "/api/v1/subnets", app.apiAddSubnets, nil, true},
 		Route{"APISubnetsDelete", "DELETE", "/api/v1/subnets", app.apiDeleteSubnet, nil, true},
 		Route{"APISubnetsEdit", "POST", "/api/v1/subnets", app.apiEditSubnet, nil, true},
+		// Report API Handlers
+		Route{"APIReports", "GET", "/api/v1/reports", app.apiViewReports, nil, true},
+		Route{"APIReportAdd", "PUT", "/api/v1/reports", app.apiAddReport, nil, true},
 		/*
 			// IP API Handlers
 			Route{"APIIPs", "GET", "/api/v1/ips", apiViewIPs, nil, true},

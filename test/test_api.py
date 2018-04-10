@@ -112,6 +112,16 @@ def test_subnets():
     if not any(s['subnet_name'] == 'test_subnet' for s in subnets):
         logger.error("subnets post/edit failed")
 
+def test_reports():
+    url = '{}reports'.format(url_base)
+
+    report = {
+            "title": "test_report",
+            "report": "The full report as a test",
+            "ip": "172.16.9.53"
+            }
+    # Test put
+    r = requests.put(url, json=report, verify=False)
 '''
 def test_ips():
     url = '{}ips'.format(url_base)
@@ -158,6 +168,7 @@ def main():
     populate_test_mongo.main()
     test_devices()
     test_subnets()
+    test_reports()
     #test_ips()
 
 if __name__ == '__main__':

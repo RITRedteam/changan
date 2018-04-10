@@ -20,8 +20,15 @@ func (db Database) GetDevice(device *Device) (*Device, error) {
 	return device, err
 }
 
-func (db Database) GetDeviceByName(device *Device) (*Device, error) {
-	err := db.C("devices").Find(bson.M{"device_name": device.Name}).One(device)
+func (db Database) GetDeviceByName(name string) (*Device, error) {
+	device := &Device{}
+	err := db.C("devices").Find(bson.M{"device_name": name}).One(device)
+	return device, err
+}
+
+func (db Database) GetDeviceByIP(ip string) (*Device, error) {
+	device := &Device{}
+	err := db.C("devices").Find(bson.M{"interfaces.ips.ip": ip}).One(device)
 	return device, err
 }
 
@@ -59,27 +66,31 @@ func (db Database) GetSubnet(subnet *Subnet) (*Subnet, error) {
 	return subnet, err
 }
 
-func (db Database) GetSubnetByName(subnet *Subnet) (*Subnet, error) {
-	err := db.C("subnets").Find(bson.M{"subnet_name": subnet.Name}).One(subnet)
+func (db Database) GetSubnetByName(name string) (*Subnet, error) {
+	subnet := &Subnet{}
+	err := db.C("subnets").Find(bson.M{"subnet_name": name}).One(subnet)
 	return subnet, err
 }
 
-// TODO
 func (db Database) AddSubnet(subnet *Subnet) error {
 	err := db.C("subnets").Insert(subnet)
 	return err
 }
 
-// TODO
 func (db Database) DeleteSubnet(subnet *Subnet) error {
 	err := db.C("subnets").Remove(subnet) // By id?
 	return err
 }
 
-// TODO
 func (db Database) EditSubnet(subnet *Subnet) error {
 	err := db.C("subnets").UpdateId(subnet.ID, subnet)
 	return err
+}
+
+func (db Database) GetAllReports() ([]Report, error) {
+	var reports []Report
+	err := db.C("reports").Find(bson.M{}).All(&reports)
+	return reports, err
 }
 
 func (db Database) GetReport(report *Report) (*Report, error) {
