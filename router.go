@@ -23,12 +23,11 @@ func (app *App) NewRouter() *mux.Router {
 		} else {
 			handler = NoSurf(route.HandlerFunc)
 		}
-		/*
-			if route.Auth != nil {
-				// TODO RBAC with configurable roles
-				handler = app.RequireLogin(handler) // TODO add RBAC
-			}
-		*/ // TODO reenable
+		if route.Auth != nil {
+			// TODO RBAC with configurable roles
+			handler = app.RequireLogin(handler) // TODO add RBAC
+		}
+		// TODO reenable
 		handler = app.LogRequest(SecureHeaders(handler), route.Name)
 
 		router.Methods(route.Method).Path(route.Pattern).Name(route.Name).Handler(handler)

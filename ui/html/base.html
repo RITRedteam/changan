@@ -22,6 +22,7 @@
         <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
         <button>Logout</button>
       </form>
+      <a href="/user/review" {{if eq .Path "/user/review"}}class="live"{{end}}>Inactive users</a>
       {{else}}
       <a href="/user/login" {{if eq .Path "/user/login"}}class="live"{{end}}>Login</a>
       <a href="/user/signup" {{if eq .Path "/user/signup"}}class="live"{{end}}>Signup</a>

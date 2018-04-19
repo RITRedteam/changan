@@ -23,6 +23,8 @@ type HTMLData struct {
 	Subnet    *models.Subnet
 	Reports   []models.Report
 	Report    *models.Report
+	Users     []models.User
+	User      *models.User
 }
 
 type APIData struct {

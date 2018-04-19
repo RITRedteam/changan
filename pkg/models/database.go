@@ -1,6 +1,12 @@
 package models
 
 import (
+	"errors"
+	"log"
+
+	"github.com/go-sql-driver/mysql"
+	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -118,4 +124,91 @@ func OpenMongo(dsn string) (*mgo.Session, *mgo.Database, error) {
 
 	db = session.DB(dsn)
 	return session, db, nil
+}
+
+// Declare a Database type (for now it's just an empty struct).
+type SQLDatabase struct {
+	*sqlx.DB
+}
+
+// This error does not exist in my project TODO
+var (
+	ErrDuplicateEmail     = errors.New("models: email address already in use")
+	ErrInvalidCredentials = errors.New("models: invalid user credentials")
+	ErrInactive           = errors.New("models: account is inactive")
+)
+
+func (db SQLDatabase) AddUser(user User) error {
+	// move this out of here or maybe not
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), 12)
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec("INSERT INTO users (username, password, api_key, active) VALUES(?, ?, ?, ?)",
+		user.Username, string(hashedPassword), user.APIKey, user.Active)
+	if err != nil {
+		if err.(*mysql.MySQLError).Number == 1062 {
+			return ErrDuplicateEmail // TODO fix this error the error is not real in my project
+		}
+	}
+	return err
+}
+
+func (db SQLDatabase) VerifyUser(user User) (int, error) {
+	var foundUser User
+	err := db.Get(&foundUser,
+		"SELECT user_id, username, password, active FROM users where username=?", user.Username)
+	if err != nil {
+		//return 0, err // use if you have no idea what is happening
+		return 0, ErrInvalidCredentials
+	}
+
+	if !foundUser.Active {
+		return 0, ErrInactive
+	}
+	// might move this elsewhere
+	err = bcrypt.CompareHashAndPassword([]byte(foundUser.Password), []byte(user.Password))
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		return 0, ErrInvalidCredentials
+	} else if err != nil {
+		return 0, err
+	}
+
+	return foundUser.UserID, nil
+}
+
+func (db SQLDatabase) GetInactiveUsers() ([]User, error) {
+	var users []User
+	err := db.Select(&users,
+		"SELECT user_id, username, password, active FROM users WHERE active=false")
+	if err != nil {
+		return users, err
+	}
+
+	return users, nil
+}
+
+func (db SQLDatabase) SetActiveUser(id int) error {
+	_, err := db.Exec("UPDATE users SET active=true WHERE user_id=?", id)
+	return err
+}
+
+func (db SQLDatabase) GetUser(id int) (*User, error) {
+	user := &User{}
+	err := db.Get(user, "SELECT user_id, username, password, active FROM users WHERE user_id=?", id)
+	return user, err
+}
+
+func OpenMysqlDB(dsn string) *sqlx.DB {
+	var db *sqlx.DB
+	db, err := sqlx.Open("mysql", dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	return db
 }

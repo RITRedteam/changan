@@ -10,6 +10,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+//TODO rewrite to use api_structs for more functionality
+
 func (app *App) apiViewDevices(w http.ResponseWriter, r *http.Request) {
 	// TODO better error handling in api
 	// TODO better json objects
@@ -295,10 +297,10 @@ func (app *App) apiViewReports(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) apiAddReport(w http.ResponseWriter, r *http.Request) {
-	newReport := &forms.NewReport{}
+	apiReport := APIReport{}
 
 	decoder := json.NewDecoder(r.Body)
-	err := decoder.Decode(&newReport)
+	err := decoder.Decode(&apiReport)
 	if err != nil {
 		if err.Error() == "EOF" {
 			app.APIServerError(w, errors.New("incorrect json"))
@@ -308,14 +310,19 @@ func (app *App) apiAddReport(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+	newReport := &forms.NewReport{
+		Title:  apiReport.Title,
+		Report: apiReport.Report,
+	}
+
 	if !newReport.Valid() {
 		// TODO gotta do this guy
 		http.Error(w, "test", http.StatusInternalServerError)
 		return
 	}
 
-	if newReport.DeviceID == bson.ObjectId("") {
-		device, err := app.Mongo.GetDeviceByIP(newReport.IP)
+	if apiReport.DeviceID == bson.ObjectId("") {
+		device, err := app.Mongo.GetDeviceByIP(apiReport.IP)
 		if err != nil {
 			app.APIServerError(w, err)
 			return

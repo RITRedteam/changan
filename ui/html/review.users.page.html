@@ -1,0 +1,25 @@
+{{define "page-title"}}Users{{end}}
+
+{{define "page-body"}}
+  <!-- TODO -->
+  <div class="snippet">
+    <table style="width:100%">
+      <tr>
+        <th>Username</th>
+        <th>Active</th>
+      </tr>
+      <div>
+        {{if .Users}}
+          {{range .Users}}
+          <tr>
+            <td><a href="/user/{{.UserID}}">{{.Username}}</a></td>
+            <td>{{.Active}}</td>
+          </tr>
+          {{end}}
+        {{else}}
+          <p>There are no unactive Users to show!</p>
+        {{end}}
+      </div>
+    </table>
+  </div>
+{{end}}

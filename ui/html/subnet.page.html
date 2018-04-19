@@ -30,7 +30,7 @@
           <strong><a href="/devices/{{.ID.Hex}}">
           {{- range .Interfaces -}}
             {{range .IPs -}}
-              {{.IP}}
+              {{.IP}},
             {{- end}}
           {{- end -}}
           </a></strong> <span>{{.Name}}</span>

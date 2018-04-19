@@ -43,7 +43,6 @@ type NewReport struct {
 	DeviceID bson.ObjectId `json:"device_id"`
 	Report   string        `json:"report"`
 	Title    string        `json:"title"`
-	IP       string        `json:"ip"`
 	Failures map[string]string
 }
 

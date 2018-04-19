@@ -10,7 +10,7 @@ import (
 // App is a struct to hold application-wide dependencies and configuration settings for our web app
 type App struct {
 	Addr      string
-	Database  *models.Database
+	Database  *models.SQLDatabase
 	Mongo     *models.Database
 	HTMLDir   string
 	StaticDir string
