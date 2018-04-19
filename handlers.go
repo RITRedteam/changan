@@ -4,14 +4,13 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	"html/template"
 	"net/http"
+	"strconv"
 
+	"github.com/gorilla/mux"
 	"github.com/koalatea/changan/pkg/forms"
 	"github.com/koalatea/changan/pkg/models"
-	"github.com/gorilla/mux"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -37,7 +36,6 @@ func (app *App) viewDevices(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-/*
 func (app *App) SignupUser(w http.ResponseWriter, r *http.Request) {
 	app.RenderHTML(w, r, "signup.page.html", &HTMLData{
 		Form: &forms.SignupUser{},
@@ -65,6 +63,7 @@ func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 		Username: form.Name,
 		Password: form.Password,
 		APIKey:   "not quite 8",
+		Active:   false,
 	}
 	err = app.Database.AddUser(user)
 	if err == models.ErrDuplicateEmail { // this error is not real TODO
@@ -83,11 +82,60 @@ func (app *App) CreateUser(w http.ResponseWriter, r *http.Request) {
 	session := app.Sessions.Load(r)
 	err = session.PutString(w, "flash", msg)
 	if err != nil {
-	app.ServerError(w, err)
-	return
+		app.ServerError(w, err)
+		return
 	}
 
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
+}
+
+func (app *App) ReviewUsers(w http.ResponseWriter, r *http.Request) {
+	users, err := app.Database.GetInactiveUsers()
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	app.RenderHTML(w, r, "review.users.page.html", &HTMLData{Users: users})
+}
+
+func (app *App) ViewUser(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userID := vars["userID"]
+
+	id, err := strconv.Atoi(userID)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+	user, err := app.Database.GetUser(id)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+	app.RenderHTML(w, r, "user.page.html", &HTMLData{User: user})
+}
+
+func (app *App) ActivateUser(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		app.ClientError(w, http.StatusBadRequest)
+		return
+	}
+
+	id, err := strconv.Atoi(r.PostForm.Get("user_id"))
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	err = app.Database.SetActiveUser(id)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
+	http.Redirect(w, r, "/user/review", http.StatusSeeOther)
 }
 
 func (app *App) LoginUser(w http.ResponseWriter, r *http.Request) {
@@ -123,6 +171,10 @@ func (app *App) VerifyUser(w http.ResponseWriter, r *http.Request) {
 		form.Failures["Generic"] = "Email or Password is incorrect"
 		app.RenderHTML(w, r, "login.page.html", &HTMLData{Form: form})
 		return
+	} else if err == models.ErrInactive {
+		form.Failures["Generic"] = "Account is currently inactive"
+		app.RenderHTML(w, r, "login.page.html", &HTMLData{Form: form})
+		return
 	} else if err != nil {
 		app.ServerError(w, err)
 		return
@@ -149,7 +201,6 @@ func (app *App) LogoutUser(w http.ResponseWriter, r *http.Request) {
 
 	http.Redirect(w, r, "/", 303)
 }
-*/
 
 func (app *App) viewDevice(w http.ResponseWriter, r *http.Request) {
 	// TODO better this code return 404 if device is not id or does not exist
@@ -349,6 +400,7 @@ func (app *App) createReport(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, fmt.Sprintf("/reports/%s", id.Hex()), http.StatusSeeOther)
 }
 
+/*
 func viewIPs(w http.ResponseWriter, r *http.Request) {
 	ips := GetAllIPs(BaseDB)
 
@@ -374,3 +426,4 @@ func viewIPs(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 }
+*/

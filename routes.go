@@ -23,23 +23,26 @@ type Routes []Route
 func (app *App) GenerateRoutes() []Route {
 	var routes = Routes{
 		Route{"Index", "GET", "/", app.Home, nil, false},
-		Route{"Devices", "GET", "/devices", app.viewDevices, nil, false},
+		Route{"Devices", "GET", "/devices", app.viewDevices, []string{"user"}, false},
 		Route{"NewDevice", "GET", "/devices/new", app.newDevice, []string{"user"}, false},
 		Route{"CreateDevice", "POST", "/devices/new", app.createDevice, []string{"user"}, false},
-		Route{"ViewDevice", "GET", "/devices/{deviceID}", app.viewDevice, nil, false},
+		Route{"ViewDevice", "GET", "/devices/{deviceID}", app.viewDevice, []string{"user"}, false},
 		Route{"Subnets", "GET", "/subnets", app.viewSubnets, nil, false},
 		Route{"ViewSubnet", "GET", "/subnets/{subnetID}", app.viewSubnet, nil, false},
 		Route{"NewReport", "GET", "/reports/new", app.newReport, []string{"user"}, false},
 		Route{"CreateReport", "POST", "/reports/new", app.createReport, []string{"user"}, false},
-		Route{"ViewReport", "GET", "/reports/{reportID}", app.viewReport, nil, false},
-		Route{"IPs", "GET", "/ips", viewIPs, nil, false},
+		Route{"ViewReport", "GET", "/reports/{reportID}", app.viewReport, []string{"user"}, false},
+		//Route{"IPs", "GET", "/ips", viewIPs, nil, false},
 
 		// users/auth
-		//Route{"User Signup Page", "GET", "/user/signup", app.SignupUser, nil, false},
-		//Route{"Signup User", "POST", "/user/signup", app.CreateUser, nil, false},
-		//Route{"User Login Page", "GET", "/user/login", app.LoginUser, nil, false},
-		//Route{"Login User", "POST", "/user/login", app.VerifyUser, nil, false},
-		//Route{"Logout User", "POST", "/user/logout", app.LogoutUser, []string{"user"}, false},
+		Route{"User Signup Page", "GET", "/user/signup", app.SignupUser, nil, false},
+		Route{"Signup User", "POST", "/user/signup", app.CreateUser, nil, false},
+		Route{"User Login Page", "GET", "/user/login", app.LoginUser, nil, false},
+		Route{"Login User", "POST", "/user/login", app.VerifyUser, nil, false},
+		Route{"Logout User", "POST", "/user/logout", app.LogoutUser, []string{"user"}, false},
+		Route{"Review Users", "GET", "/user/review", app.ReviewUsers, []string{"user"}, false},
+		Route{"Activate Users", "POST", "/user/active", app.ActivateUser, []string{"user"}, false},
+		Route{"View User", "GET", "/user/{userID}", app.ViewUser, []string{"user"}, false},
 
 		// API Handlers
 		// Device API Handlers
@@ -52,6 +55,9 @@ func (app *App) GenerateRoutes() []Route {
 		Route{"APISubnetsAdd", "PUT", "/api/v1/subnets", app.apiAddSubnets, nil, true},
 		Route{"APISubnetsDelete", "DELETE", "/api/v1/subnets", app.apiDeleteSubnet, nil, true},
 		Route{"APISubnetsEdit", "POST", "/api/v1/subnets", app.apiEditSubnet, nil, true},
+		// Report API Handlers
+		Route{"APIReports", "GET", "/api/v1/reports", app.apiViewReports, nil, true},
+		Route{"APIReportAdd", "PUT", "/api/v1/reports", app.apiAddReport, nil, true},
 		/*
 			// IP API Handlers
 			Route{"APIIPs", "GET", "/api/v1/ips", apiViewIPs, nil, true},

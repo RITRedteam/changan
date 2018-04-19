@@ -10,6 +10,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+//TODO rewrite to use api_structs for more functionality
+
 func (app *App) apiViewDevices(w http.ResponseWriter, r *http.Request) {
 	// TODO better error handling in api
 	// TODO better json objects
@@ -99,7 +101,7 @@ func (app *App) apiDeleteDevices(w http.ResponseWriter, r *http.Request) {
 	if device.ID != bson.ObjectId("") {
 		app.Mongo.DeleteDevice(device)
 	} else if device.Name != "" {
-		device2, err := app.Mongo.GetDeviceByName(device) // can try deleting by name too later TODO
+		device2, err := app.Mongo.GetDeviceByName(device.Name) // can try deleting by name too later TODO
 		if err != nil {
 			app.APIServerError(w, err)
 			return
@@ -132,7 +134,7 @@ func (app *App) apiEditDevices(w http.ResponseWriter, r *http.Request) {
 	app.Logger.Debugf("Device sent to API Edit Device %+v", device)
 
 	if device.ID == bson.ObjectId("") {
-		newDevice, err = app.Mongo.GetDeviceByName(device)
+		newDevice, err = app.Mongo.GetDeviceByName(device.Name)
 		if err != nil {
 			app.APIServerError(w, err)
 		} else if newDevice.ID == bson.ObjectId("") {
@@ -223,7 +225,7 @@ func (app *App) apiDeleteSubnet(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	} else if subnet.Name != "" {
-		deleteSubnet, err := app.Mongo.GetSubnetByName(subnet) // can try deleting by name too later TODO
+		deleteSubnet, err := app.Mongo.GetSubnetByName(subnet.Name) // can try deleting by name too later TODO
 		if err != nil {
 			app.APIServerError(w, err)
 			return
@@ -247,7 +249,7 @@ func (app *App) apiDeleteSubnet(w http.ResponseWriter, r *http.Request) {
 
 func (app *App) apiEditSubnet(w http.ResponseWriter, r *http.Request) {
 	subnet := &models.Subnet{}
-	newSubnet := &models.Subnet{} // TODO better naming
+	newSubnet := &models.Subnet{} // TODO better naming still need to test for validity
 	decoder := json.NewDecoder(r.Body)
 	err := decoder.Decode(subnet)
 	if err != nil {
@@ -260,7 +262,7 @@ func (app *App) apiEditSubnet(w http.ResponseWriter, r *http.Request) {
 	app.Logger.Debugf("Subnet sent to API Edit Subnet %+v", subnet)
 
 	if subnet.ID == bson.ObjectId("") {
-		newSubnet, err = app.Mongo.GetSubnetByName(subnet)
+		newSubnet, err = app.Mongo.GetSubnetByName(subnet.Name)
 		if err != nil {
 			app.APIServerError(w, err)
 		} else if newSubnet.ID == bson.ObjectId("") {
@@ -278,5 +280,70 @@ func (app *App) apiEditSubnet(w http.ResponseWriter, r *http.Request) {
 	data := &APIData{
 		Result: "Subnet edited",
 	}
+	app.ReturnAPI(w, r, data)
+}
+
+func (app *App) apiViewReports(w http.ResponseWriter, r *http.Request) {
+	reports, err := app.Mongo.GetAllReports()
+	if err != nil {
+		app.APIServerError(w, err)
+		return
+	}
+
+	//renderTemplate(w, r, "templates/devices.html",
+	data := &APIData{Reports: reports}
+
+	app.ReturnAPI(w, r, data)
+}
+
+func (app *App) apiAddReport(w http.ResponseWriter, r *http.Request) {
+	apiReport := APIReport{}
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&apiReport)
+	if err != nil {
+		if err.Error() == "EOF" {
+			app.APIServerError(w, errors.New("incorrect json"))
+		} else {
+			app.APIServerError(w, err)
+			return
+		}
+	}
+
+	newReport := &forms.NewReport{
+		Title:  apiReport.Title,
+		Report: apiReport.Report,
+	}
+
+	if !newReport.Valid() {
+		// TODO gotta do this guy
+		http.Error(w, "test", http.StatusInternalServerError)
+		return
+	}
+
+	if apiReport.DeviceID == bson.ObjectId("") {
+		device, err := app.Mongo.GetDeviceByIP(apiReport.IP)
+		if err != nil {
+			app.APIServerError(w, err)
+			return
+		}
+		newReport.DeviceID = device.ID
+	}
+
+	id := bson.NewObjectId()
+	report := &models.Report{
+		ID:       id,
+		Title:    newReport.Title,
+		DeviceID: newReport.DeviceID,
+		Report:   newReport.Report,
+	}
+
+	err = app.Mongo.AddReport(report)
+	if err != nil {
+		app.APIServerError(w, err)
+		return
+	}
+
+	data := &APIData{Result: "report added"}
 	app.ReturnAPI(w, r, data)
 }

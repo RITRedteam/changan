@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/koalatea/changan/pkg/models"
 	"github.com/justinas/nosurf"
+	"github.com/koalatea/changan/pkg/models"
 )
 
 type HTMLData struct {
@@ -23,11 +23,14 @@ type HTMLData struct {
 	Subnet    *models.Subnet
 	Reports   []models.Report
 	Report    *models.Report
+	Users     []models.User
+	User      *models.User
 }
 
 type APIData struct {
 	Subnets []models.Subnet `json:"subnets"`
 	Devices []models.Device `json:"devices"`
+	Reports []models.Report `json:"reports"`
 	Result  string          `json:"result"`
 	Error   string          `json:"error"`
 }

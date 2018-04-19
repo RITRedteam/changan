@@ -33,6 +33,8 @@ func main() {
 
 	dbSQL := openDB(*dsn) // need for sessions at the moment.
 	defer dbSQL.Close()
+	sqlx := models.OpenMysqlDB(*dsn)
+	defer sqlx.Close()
 	mongoSession, mongoDB, err := models.OpenMongo(*databaseName)
 	if err != nil {
 		log.Fatal(err)
@@ -47,6 +49,7 @@ func main() {
 	app := &App{
 		Addr:      *addr,
 		Mongo:     &models.Database{mongoDB}, //TODO verify this works
+		Database:  &models.SQLDatabase{sqlx},
 		HTMLDir:   *htmlDir,
 		StaticDir: *staticDir,
 		Sessions:  sessionManager,

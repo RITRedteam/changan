@@ -5,7 +5,7 @@
   <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
   {{with .Form}}
     <div>
-      <label>Name:</label>
+      <label>Username:</label>
       {{with .Failures.Name}}
         <label class="error">{{.}}</label>
       {{end}}

@@ -1,0 +1,17 @@
+{{define "page-title"}}User #{{.User.UserID}}{{end}}
+
+{{define "page-body"}}
+    <!-- TODO -->
+    <div class="snippet">
+      <div class="metadata">
+        <strong>{{.User.Username}}</strong>
+        <span>#{{.User.UserID}}</span>
+      </div>
+      <div>
+        <form action="/user/active" method="POST">
+          <input type="hidden" name="user_id" value="{{.User.UserID}}">
+          <input type="hidden" name="csrf_token" value="{{.CSRFToken}}">
+          <input type="submit" value="Set Active">
+        </form>
+      </div>
+{{end}}

@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_id int(5) NOT NULL AUTO_INCREMENT,
     password char(60) NOT NULL,
     api_key varchar(50) DEFAULT NULL,
+    active BOOL,
     PRIMARY KEY(user_id),
     UNIQUE KEY(username)
     );
@@ -88,8 +89,8 @@ INSERT INTO interfaces (device_id, ip_id, mac, interface_name) values(5, 10, 'AA
 INSERT INTO interfaces (device_id, ip_id, mac, interface_name) values(6, 1, 'AA:BB:CC:DD:EE:AA', 'eth0');
 INSERT INTO interfaces (device_id, ip_id, mac, interface_name) values(7, 2, 'AA:BB:CC:DD:FF:FF', 'eth0');
 INSERT INTO interfaces (device_id, ip_id, mac, interface_name) values(8, 3, 'AA:BB:CC:DD:FF:EE', 'eth0');
-INSERT INTO users (user_id, username, password, api_key) values(1, 'rwhittier', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'aaa');
-INSERT INTO users (user_id, username, password, api_key) values(2, 'test', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'bbb');
+INSERT INTO users (user_id, username, password, api_key, active) values(1, 'rwhittier', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'aaa', True);
+INSERT INTO users (user_id, username, password, api_key, active) values(2, 'test', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'bbb', False);
 INSERT INTO reports (device_id, report, last_user_id) values(1, 'Is fuckity fucked', 1);
 INSERT INTO reports (device_id, report, last_user_id) values(3, 'No way Jose', 1);
 INSERT INTO reports (device_id, report, last_user_id) values(8, 'Is starting to get full should be addressed', 2);

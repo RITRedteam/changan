@@ -52,11 +52,11 @@ interfaces = [
     (7, 2, 'AA:BB:CC:DD:FF:FF', 'eth0'),
     (8, 3, 'AA:BB:CC:DD:FF:EE', 'eth0')
 ]
-user_fields = ['user_id', 'username', 'password', 'api_key']
+user_fields = ['user_id', 'username', 'password', 'api_key', 'active']
 users = [
     # password is testtest
-    (1, 'rwhittier', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'aaa'),
-    (2, 'test', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'bbb')
+    (1, 'rwhittier', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'aaa', True),
+    (2, 'test', '$2a$12$9TZ3IJjTaYIB9Yrct5YT.ey7DGsybJR6d8nMb.Q8coFDKwqUMTCju', 'bbb', False)
 ]
 report_fields = ['device_id', 'report', 'last_user_id']
 reports = [
@@ -103,6 +103,7 @@ create_tables_strings = [
     user_id int(5) NOT NULL AUTO_INCREMENT,
     password char(60) NOT NULL,
     api_key varchar(50) DEFAULT NULL,
+    active BOOL,
     PRIMARY KEY(user_id),
     UNIQUE KEY(username)
     );''',
@@ -171,8 +172,8 @@ def insert_data(cursor, file_obj):
         file_obj.write("{}\n".format(insert_line))
         cursor.execute(insert_line)
     for user in users:
-        insert_line = 'INSERT INTO users ({}) values({}, \'{}\', \'{}\', \'{}\');'.format(
-                ', '.join(user_fields), user[0], user[1], user[2], user[3])
+        insert_line = 'INSERT INTO users ({}) values({}, \'{}\', \'{}\', \'{}\', {});'.format(
+                ', '.join(user_fields), user[0], user[1], user[2], user[3], user[4])
         logging.debug('insert line to run: {}'.format(insert_line))
         file_obj.write("{}\n".format(insert_line))
         cursor.execute(insert_line)

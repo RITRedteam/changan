@@ -39,5 +39,6 @@
   {{else}}
     <div class="title">No Reports for Device <b>{{.Device.Name}}</b> - <b>{{.Device.ID.Hex}}</b></div>
   {{end}}
+  <a href="/reports/new?device={{.Device.ID.Hex}}" class="add">Add Report</a>
   </pre>
 {{end}}

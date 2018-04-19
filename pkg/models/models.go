@@ -38,3 +38,12 @@ type Report struct {
 	Title    string        `bson:"title" json:"title"`
 	Report   string        `bson:"report" json:"report"`
 }
+
+type User struct {
+	UserID   int    `db:"user_id"`
+	GroupID  int    `db:"group_id"`
+	Username string `db:"username"`
+	Password string `db:"password"`
+	APIKey   string `db:"api_key"`
+	Active   bool   `db:"active"`
+}
