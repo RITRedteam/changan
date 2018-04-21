@@ -30,6 +30,7 @@ type HTMLData struct {
 type APIData struct {
 	Subnets []models.Subnet `json:"subnets,omitempty"`
 	Devices []models.Device `json:"devices,omitempty"`
+	Device  *models.Device  `json:"device,omitempty"`
 	Reports []models.Report `json:"reports,omitempty"`
 	Result  string          `json:"result,omitempty"`
 	Error   string          `json:"error,omitempty"`

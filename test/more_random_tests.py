@@ -11,22 +11,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def run_test():
-    url = '{}devices'.format(url_base)
+    url = '{}device'.format(url_base)
     # Test add
     device = {
-            "device_name": "test_device",
-            "team": "test_team",
-            "owner": "test_owner",
-            "location": "test_location",
-            "interfaces": [{
-                "mac": "ff:ff:ff:ff:ff:ff",
-                "interface_name": "eth0",
-                "ips": [{
-                    "ip":"172.16.10.7"
-                    }]
-            }]
+            "device_name": "SQL",
     }
-    r = requests.put(url, json=device, verify=False)
+    r = requests.get(url, json=device, verify=False)
+    embed()
 
 def main():
     run_test()

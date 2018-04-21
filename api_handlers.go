@@ -12,6 +12,31 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+func (app *App) apiViewDevice(w http.ResponseWriter, r *http.Request) { //TODO this is dumb
+	// TODO better error handling in api
+	// TODO better json objects
+	device := &models.Device{}
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&device)
+	if err != nil {
+		app.APIServerError(w, err) // TODO this is messed up look at the rest of API code
+	}
+	if device.Name != "" {
+		device, err = app.Mongo.GetDeviceByName(device.Name)
+		if err != nil {
+			app.APIServerError(w, err)
+			return
+		}
+	} else {
+		app.APIServerError(w, errors.New("add a name you moron"))
+	}
+
+	//renderTemplate(w, r, "templates/devices.html",
+	data := &APIData{Device: device}
+
+	app.ReturnAPI(w, r, data)
+}
+
 //TODO rewrite to use api_structs for more functionality
 
 func (app *App) apiViewDevices(w http.ResponseWriter, r *http.Request) {
