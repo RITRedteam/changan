@@ -188,6 +188,12 @@ func (app *App) VerifyUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = session.PutString(w, "Username", user.Username)
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
 
@@ -382,15 +388,23 @@ func (app *App) createReport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	session := app.Sessions.Load(r)
+	username, err := session.GetString("Username")
+	if err != nil {
+		app.ServerError(w, err)
+		return
+	}
+
 	id := bson.NewObjectId()
 	report := &models.Report{
 		ID:       id,
 		DeviceID: form.DeviceID,
 		Title:    form.Title,
 		Report:   form.Report,
+		LastUser: username,
 	}
 
-	err = app.Mongo.AddReport(report) // TODO revisit if this should be pointer
+	err = app.Mongo.AddReport(report)
 	if err != nil {
 		app.ServerError(w, err)
 		return

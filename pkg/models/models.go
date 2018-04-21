@@ -37,6 +37,7 @@ type Report struct {
 	DeviceID bson.ObjectId `bson:"device_id" json:"device_id"`
 	Title    string        `bson:"title" json:"title"`
 	Report   string        `bson:"report" json:"report"`
+	LastUser string        `bson:"user"`
 }
 
 type User struct {

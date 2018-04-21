@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/koalatea/changan/pkg/forms"
@@ -28,6 +30,8 @@ func (app *App) apiViewDevices(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) apiAddDevices(w http.ResponseWriter, r *http.Request) {
+	var subnets []models.Subnet
+	gotSubnets := false
 	newDevice := &forms.NewDevice{}
 
 	decoder := json.NewDecoder(r.Body)
@@ -52,13 +56,49 @@ func (app *App) apiAddDevices(w http.ResponseWriter, r *http.Request) {
 	for _, newDeviceInterface := range newDevice.Interfaces {
 		var newInterface models.Interface
 		newInterface.MAC = newDeviceInterface.MAC
+		if newInterface.MAC == "" {
+			newInterface.MAC = "FF:FF:FF:FF:FF:FF"
+		}
 		newInterface.Name = newDeviceInterface.Name
+		if newInterface.Name == "" {
+			newInterface.Name = "unknown" // TODO lets move this to a more generic area like forms
+			// as this will have to happen in web console too.
+		}
 		var ips []models.IP
 		for _, ip := range newDeviceInterface.IPs {
-			id2 := bson.NewObjectId() // TODO when subnets are implemented make this auto figure out
 			newIP := models.IP{
 				IP:       ip.IP,
-				SubnetID: id2,
+				SubnetID: ip.SubnetID,
+			}
+			if newIP.SubnetID == bson.ObjectId("") { // Could be improved in
+				if !gotSubnets {
+					subnets, err = app.Mongo.GetAllSubnets()
+					if err != nil {
+						app.APIServerError(w, err)
+						return
+					}
+
+					app.Logger.Debugf("api add device had no subnet id for ip '%s'", ip.IP)
+					app.Logger.Debugf("so got subnets: %+v", subnets)
+					gotSubnets = true
+				}
+
+				netIP := net.ParseIP(ip.IP)
+				for _, subnet := range subnets {
+					_, ipNet, _ := net.ParseCIDR(fmt.Sprintf("%s/%d", subnet.IP, subnet.Mask))
+					if ipNet.Contains(netIP) {
+						app.Logger.Debugf("device '%s' has ip '%s' that matched subnet %s", newDevice.Name,
+							ip.IP, ipNet)
+						if subnet.IP != "0.0.0.0" {
+							newIP.SubnetID = subnet.ID
+						}
+					}
+					// dynamically figure out ip
+				}
+				if newIP.SubnetID == bson.ObjectId("") {
+					id2 := bson.NewObjectId() // TODO when subnets are implemented make this auto figure out
+					newIP.SubnetID = id2
+				}
 			}
 			ips = append(ips, newIP)
 		}
@@ -120,6 +160,7 @@ func (app *App) apiDeleteDevices(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *App) apiEditDevices(w http.ResponseWriter, r *http.Request) {
+	// TODO on edit if interfaces need to check it for correctness
 	device := &models.Device{}
 	newDevice := &models.Device{} // TODO better naming
 	decoder := json.NewDecoder(r.Body)
@@ -336,6 +377,7 @@ func (app *App) apiAddReport(w http.ResponseWriter, r *http.Request) {
 		Title:    newReport.Title,
 		DeviceID: newReport.DeviceID,
 		Report:   newReport.Report,
+		LastUser: "api",
 	}
 
 	err = app.Mongo.AddReport(report)
