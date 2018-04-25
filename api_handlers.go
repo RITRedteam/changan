@@ -95,7 +95,9 @@ func (app *App) apiAddDevices(w http.ResponseWriter, r *http.Request) {
 				IP:       ip.IP,
 				SubnetID: ip.SubnetID,
 			}
+			// If there is no subnet id we will figure out the subnet for the ip
 			if newIP.SubnetID == bson.ObjectId("") { // Could be improved in
+				// If subnets have not been queried from the database yet get them
 				if !gotSubnets {
 					subnets, err = app.Mongo.GetAllSubnets()
 					if err != nil {
@@ -108,6 +110,8 @@ func (app *App) apiAddDevices(w http.ResponseWriter, r *http.Request) {
 					gotSubnets = true
 				}
 
+				// check if ip is in each subnet and when one is found that the ip is in set that as it's subnet id
+				// TODO improve this to work for the lowest level when parent subnets exist
 				netIP := net.ParseIP(ip.IP)
 				for _, subnet := range subnets {
 					_, ipNet, _ := net.ParseCIDR(fmt.Sprintf("%s/%d", subnet.IP, subnet.Mask))
